@@ -7,43 +7,33 @@ namespace MinhaCdn.Integration.Convert.Applications
     {
         public string ConvertLogFile(ConvertToMinhaCdnLog convertToMinhaCdnLog)
         {
-            // Baixar o arquivo de log (simulando com uma leitura do arquivo local)
+            // Caminho completo do arquivo de entrada
             var pathWithFileInput = $@"{convertToMinhaCdnLog.Path}\\{convertToMinhaCdnLog.FileNameInput}";
-
             string logContent = File.ReadAllText(pathWithFileInput);
 
-            // Quebra o conteúdo do arquivo por linha
+            // Divide o conteúdo do arquivo por linhas
             var lines = logContent.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
             // Criar o cabeçalho
             var header = new LogHeader();
-            var logEntries = new List<string> { header.ToString() };
+            var logEntries = new List<string> { header.ToString() }; // Inclui o cabeçalho
 
-            // Adiciona a primeira linha "1"
-            //logEntries.Add("1");
-
-            // Processa cada linha do arquivo
-            var formattedLines = new List<string>();
+            // Processa cada linha e adiciona ao log
             foreach (var line in lines)
             {
                 var logEntry = ParseLogLine(line);
                 var lineFormated = logEntry.ToAgoraFormat();
-
                 logEntries.Add(lineFormated);
-                formattedLines.Add(lineFormated);
             }
 
-            // Escrever o arquivo no formato "Agora"
-            // File.WriteAllLines(convertToMinhaCdnLog.OutputPath, logEntries);
-
-            var pathWithFileOutput = $@"{convertToMinhaCdnLog.Path}\\{convertToMinhaCdnLog.FileNameOutput}";
-
+            // Caminho completo do arquivo de saída
+            var pathWithFileOutput = $@"{convertToMinhaCdnLog.PathOutput}\\{convertToMinhaCdnLog.FileNameOutput}";
 
             // Criar e escrever o arquivo com extensão ".formatted"
             string formattedFilePath = Path.ChangeExtension(pathWithFileOutput, ".formatted");
-            File.WriteAllLines(formattedFilePath, formattedLines);
+            File.WriteAllLines(formattedFilePath, logEntries);
 
-            return "Arquivo convertido e arquivo formatado gerados com sucesso!";
+            return "Arquivo convertido e salvo com sucesso!";
         }
 
         private LogEntry ParseLogLine(string line)
