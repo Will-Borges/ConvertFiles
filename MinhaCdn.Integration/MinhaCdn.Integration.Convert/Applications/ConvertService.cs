@@ -8,7 +8,9 @@ namespace MinhaCdn.Integration.Convert.Applications
         public string ConvertLogFile(ConvertToMinhaCdnLog convertToMinhaCdnLog)
         {
             // Baixar o arquivo de log (simulando com uma leitura do arquivo local)
-            string logContent = File.ReadAllText(convertToMinhaCdnLog.FilePathInput);
+            var pathWithFileInput = $@"{convertToMinhaCdnLog.Path}\\{convertToMinhaCdnLog.FileNameInput}";
+
+            string logContent = File.ReadAllText(pathWithFileInput);
 
             // Quebra o conteúdo do arquivo por linha
             var lines = logContent.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
@@ -32,10 +34,13 @@ namespace MinhaCdn.Integration.Convert.Applications
             }
 
             // Escrever o arquivo no formato "Agora"
-            File.WriteAllLines(convertToMinhaCdnLog.OutputPath, logEntries);
+            // File.WriteAllLines(convertToMinhaCdnLog.OutputPath, logEntries);
+
+            var pathWithFileOutput = $@"{convertToMinhaCdnLog.Path}\\{convertToMinhaCdnLog.FileNameOutput}";
+
 
             // Criar e escrever o arquivo com extensão ".formatted"
-            string formattedFilePath = Path.ChangeExtension(convertToMinhaCdnLog.OutputPath, ".formatted");
+            string formattedFilePath = Path.ChangeExtension(pathWithFileOutput, ".formatted");
             File.WriteAllLines(formattedFilePath, formattedLines);
 
             return "Arquivo convertido e arquivo formatado gerados com sucesso!";

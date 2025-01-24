@@ -2,7 +2,8 @@
 {
     public class ConvertToMinhaCdnLog
     {
-        public string FilePathInput { get; set; } = string.Empty;
+        public string FileNameInput { get; set; } = string.Empty;
+        public string Path { get; set; } = string.Empty;
         public string FileNameOutput { get; set; } = string.Empty;
     }
 }
