@@ -22,7 +22,7 @@ namespace MinhaCdn.Integration.Controllers
             {
                 var convertService = new ConvertService();
 
-                var response = convertService.ConvertLogFile(convertToMinhaCdnLog);
+                var response = await convertService.ConvertLogFileAsync(convertToMinhaCdnLog);
                 return Ok(response);
             }
             catch (Exception e)

@@ -4,6 +4,6 @@ namespace MinhaCdn.Integration.Convert.Abstractions
 {
     public interface IConvertService
     {
-        string ConvertLogFile(ConvertToMinhaCdnLog convertToMinhaCdnLog);
+        Task<string> ConvertLogFileAsync(ConvertToMinhaCdnLog convertToMinhaCdnLog);
     }
 }

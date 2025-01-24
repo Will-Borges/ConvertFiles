@@ -1,15 +1,42 @@
 ﻿using MinhaCdn.Integration.Convert.Abstractions;
 using MinhaCdn.Integration.Convert.Models;
+using MinhaCdn.Integration.Convert.Models.Logs;
 
 namespace MinhaCdn.Integration.Convert.Applications
 {
     public class ConvertService : IConvertService
     {
-        public string ConvertLogFile(ConvertToMinhaCdnLog convertToMinhaCdnLog)
+        private readonly HttpClient _httpClient;
+
+        public ConvertService()
         {
-            // Caminho completo do arquivo de entrada
-            var pathWithFileInput = $@"{convertToMinhaCdnLog.Path}\\{convertToMinhaCdnLog.FileNameInput}";
-            string logContent = File.ReadAllText(pathWithFileInput);
+            _httpClient = new HttpClient();
+        }
+
+        public async Task<string> ConvertLogFileAsync(ConvertToMinhaCdnLog convertToMinhaCdnLog)
+        {
+            string logContent;
+
+            // Verificar se o caminho é uma URL
+            if (Uri.TryCreate(convertToMinhaCdnLog.Path, UriKind.Absolute, out var uriResult) &&
+                (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps))
+            {
+                // Baixar o conteúdo do arquivo pela URL
+                try
+                {
+                    logContent = await _httpClient.GetStringAsync($"{convertToMinhaCdnLog.Path}/{convertToMinhaCdnLog.FileNameInput}");
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            else
+            {
+                // Caminho local: Ler o arquivo diretamente
+                var pathWithFileInput = $@"{convertToMinhaCdnLog.Path}\\{convertToMinhaCdnLog.FileNameInput}";
+                logContent = File.ReadAllText(pathWithFileInput);
+            }
 
             // Divide o conteúdo do arquivo por linhas
             var lines = logContent.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
@@ -36,13 +63,13 @@ namespace MinhaCdn.Integration.Convert.Applications
             return "Arquivo convertido e salvo com sucesso!";
         }
 
-        private LogEntry ParseLogLine(string line)
+        private LogAgoraInput ParseLogLine(string line)
         {
             // Divide a linha com base no delimitador '|'
             var parts = line.Split('|');
 
             // Cria o LogEntry de acordo com os dados
-            return new LogEntry
+            return new LogAgoraInput
             {
                 ResponseSize = int.Parse(parts[0]),     // Resposta
                 StatusCode = int.Parse(parts[1]),       // Código de status
@@ -54,33 +81,4 @@ namespace MinhaCdn.Integration.Convert.Applications
         }
     }
 
-    // Representa uma entrada de log
-    public class LogEntry
-    {
-        public int ResponseSize { get; set; }
-        public int StatusCode { get; set; }
-        public string CacheStatus { get; set; } = string.Empty;
-        public string HttpMethod { get; set; } = string.Empty;
-        public string UriPath { get; set; } = string.Empty;
-        public double TimeTaken { get; set; }
-
-        // Método para formatar no estilo 'Agora'
-        public string ToAgoraFormat()
-        {
-            return $"\"MINHA CDN\" {HttpMethod} {StatusCode} {UriPath} {TimeTaken} {ResponseSize} {CacheStatus}";
-        }
-    }
-
-    // Representa o cabeçalho do arquivo 'Agora'
-    public class LogHeader
-    {
-        public string Version { get; set; } = "1.0";
-        public DateTime Date { get; set; } = DateTime.Now;
-        public string Fields { get; set; } = "provider http-method status-code uri-path time-taken response-size cache-status";
-
-        public override string ToString()
-        {
-            return $"#Version: {Version}\n#Date: {Date:dd/MM/yyyy HH:mm:ss}\n#Fields: {Fields}";
-        }
-    }
 }

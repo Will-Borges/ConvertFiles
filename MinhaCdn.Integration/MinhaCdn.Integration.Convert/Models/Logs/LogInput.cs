@@ -1,4 +1,4 @@
-﻿namespace MinhaCdn.Integration.Convert.Models
+﻿namespace MinhaCdn.Integration.Convert.Models.Logs
 {
     public class LogInput
     {
