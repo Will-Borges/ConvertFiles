@@ -1,0 +1,6 @@
+@MinhaCdn.Integration_HostAddress = http://localhost:5208
+
+GET {{MinhaCdn.Integration_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
