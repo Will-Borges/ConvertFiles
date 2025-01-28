@@ -43,6 +43,7 @@ Para realizar a conversão de logs, envie uma requisição POST para o endpoint 
 - **fileNameInput**: Nome do arquivo que deseja converter.
 - **path**: Caminho onde está localizado o arquivo (web ou local).
 - **fileNameOutput**: Nome do arquivo convertido que será criado.
+- **pathOutput**: Caminho onde será o criado o novo arquivo convertido.
 - **extensionOutPut**: Extensão a ser utilizada no arquivo final.
 
 ### Exemplo de Requisição
